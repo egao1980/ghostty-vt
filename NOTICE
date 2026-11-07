@@ -1,0 +1,12 @@
+ghostty-vt (MIT) binds libghostty-vt (MIT), the terminal emulation library
+from Ghostty: https://github.com/ghostty-org/ghostty
+
+Overlay binaries are built from the signed libghostty-vt release tarballs
+(see include/PROVENANCE.md). They statically include:
+
+  simdutf          Apache-2.0 OR MIT
+  Google Highway   Apache-2.0 OR BSD-3-Clause
+  Wuffs            Apache-2.0 OR MIT
+  uucode           MIT (Unicode data: Unicode-3.0)
+
+native/ghostty-vt-cl.c (the struct-by-value shim) is part of this repo (MIT).

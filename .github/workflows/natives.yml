@@ -1,0 +1,39 @@
+# Build libghostty-vt + ghostty-vt-cl for every overlay from the signed
+# release tarballs. Linux and Windows cross-compile with Zig on one Ubuntu
+# runner; darwin builds on macOS. Uploads native-<os>-<arch> artifacts.
+name: Build natives
+
+on:
+  workflow_call:
+
+env:
+  ZIG_VERSION: "0.17.1"
+
+jobs:
+  cross:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+      - run: sudo apt-get update && sudo apt-get install -y minisign
+      - run: ./scripts/build-ghostty-vt.sh linux-amd64 linux-arm64 windows-amd64
+      - uses: actions/upload-artifact@v6
+        with: { name: native-linux-amd64, path: lib/linux-amd64/ }
+      - uses: actions/upload-artifact@v6
+        with: { name: native-linux-arm64, path: lib/linux-arm64/ }
+      - uses: actions/upload-artifact@v6
+        with: { name: native-windows-amd64, path: lib/windows-amd64/ }
+
+  darwin:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+      - run: brew install minisign
+      - run: ./scripts/build-ghostty-vt.sh darwin-arm64
+      - uses: actions/upload-artifact@v6
+        with: { name: native-darwin-arm64, path: lib/darwin-arm64/ }
