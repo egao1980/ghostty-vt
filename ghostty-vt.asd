@@ -1,5 +1,5 @@
 (defsystem "ghostty-vt"
-  :version "0.1.0"
+  :version "0.2.0"
   :description "CFFI bindings + native overlays for libghostty-vt 1.0 (Ghostty's terminal emulation library)"
   :author "egao1980"
   :license "MIT"

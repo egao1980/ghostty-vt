@@ -18,7 +18,7 @@
 #endif
 
 /* Bump when a function below is added or changes signature. */
-#define GHOSTTY_VT_CL_ABI 1
+#define GHOSTTY_VT_CL_ABI 2
 
 CL_API int ghostty_vt_cl_abi(void) { return GHOSTTY_VT_CL_ABI; }
 
@@ -58,4 +58,16 @@ CL_API GhosttyResult ghostty_vt_cl_terminal_scroll_viewport(
   behavior.tag = (GhosttyTerminalScrollViewportTag)tag;
   behavior.value.delta = delta;
   return ghostty_terminal_scroll_viewport(terminal, behavior);
+}
+
+/* ABI 2. tag: GhosttyPointTag (ACTIVE, VIEWPORT, SCREEN, HISTORY). */
+CL_API GhosttyResult ghostty_vt_cl_terminal_grid_ref(GhosttyTerminal terminal,
+                                                    int tag, uint16_t x,
+                                                    uint32_t y,
+                                                    GhosttyGridRef *out_ref) {
+  GhosttyPoint point;
+  point.tag = (GhosttyPointTag)tag;
+  point.value.coordinate.x = x;
+  point.value.coordinate.y = y;
+  return ghostty_terminal_grid_ref(terminal, point, out_ref);
 }

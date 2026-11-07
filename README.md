@@ -29,7 +29,7 @@ CFFI bindings and native overlays for [libghostty-vt 1.0](https://mitchellh.com/
 
 ## The shim
 
-`native/ghostty-vt-cl.c` wraps the five calls the backend needs that pass a struct by value: key-event UTF-8 get/set, mouse position get/set, and viewport scroll. Those structs travel in integer registers, float registers or a hidden pointer depending on the ABI. A C compiler gets that right; CFFI without libffi can't. The shim adds no other logic.
+`native/ghostty-vt-cl.c` wraps the six calls the backend needs that pass a struct by value: key-event UTF-8 get/set, mouse position get/set, viewport scroll, and grid refs (shim ABI 2). Those structs travel in integer registers, float registers or a hidden pointer depending on the ABI. A C compiler gets that right; CFFI without libffi can't. The shim adds no other logic.
 
 ## Regenerating
 
