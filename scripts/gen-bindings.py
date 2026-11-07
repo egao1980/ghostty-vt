@@ -59,6 +59,21 @@ def keyword(name):
     return f":|{k.upper()}|" if k[0].isdigit() else f":{k}"
 
 
+NARROW = {1: ":uint8", 2: ":uint16"}
+
+
+def narrow_enums():
+    """(enum, size) pairs where a struct stores an enum in fewer bytes than
+    the enum itself (GhosttyStyleColor.tag is one byte)."""
+    out = set()
+    for info in TYPES.values():
+        for f in info.get("fields", {}).values():
+            t = TYPES.get(f["type"], {})
+            if t.get("kind") == "enum" and f["size"] != t["size"]:
+                out.add((f["type"], f["size"]))
+    return sorted(out)
+
+
 def type_ref(spec):
     """CFFI type for a field/param spec from the JSON."""
     t = spec["type"] if isinstance(spec, dict) else spec
@@ -113,9 +128,14 @@ def emit_types(out, exports):
         base = PRIMITIVE[info["underlying"]]
         values = [f"({keyword(k)} {v})"
                   for k, v in sorted(info["values"].items(), key=lambda kv: kv[1])
-                  if k != "MAX_VALUE"]
+                  if not k.endswith("MAX_VALUE")]
         out.append(f"(cffi:defcenum ({lname} {base})\n  " + "\n  ".join(values) + ")")
         exports.add(lname)
+        for narrow, size in narrow_enums():
+            if narrow == name:
+                out.append(f"(cffi:defcenum ({lname}-{size * 8} {NARROW[size]})\n  "
+                           + "\n  ".join(values) + ")")
+                exports.add(f"{lname}-{size * 8}")
 
     out.append("\n;;; Bitfield readers: (READER integer) → field value")
     for name, info in sorted(TYPES.items()):
@@ -156,6 +176,9 @@ def emit_types(out, exports):
                 offset = f" :offset {f['offset']}" if info["kind"] == "struct" else ""
                 if f["type"] == "array":
                     slots.append(f"({fname} {type_ref(f['elem'])} :count {f['count']}{offset})")
+                elif (TYPES.get(f["type"], {}).get("kind") == "enum"
+                      and f["size"] != TYPES[f["type"]]["size"]):
+                    slots.append(f"({fname} {kebab(f['type'])}-{f['size'] * 8}{offset})")
                 else:
                     slots.append(f"({fname} {type_ref(f)}{offset})")
             out.append(f"(cffi:{macro} ({lname} :size {info['size']})\n  "

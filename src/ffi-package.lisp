@@ -444,6 +444,7 @@
    #:style
    #:style-color
    #:style-color-tag
+   #:style-color-tag-8
    #:style-color-value
    #:style-default
    #:style-flags
