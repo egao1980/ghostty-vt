@@ -27,4 +27,5 @@
    #:key-event-set-utf8
    #:key-event-get-utf8
    #:mouse-event-set-position
-   #:terminal-scroll-viewport))
+   #:terminal-scroll-viewport
+   #:terminal-grid-ref))

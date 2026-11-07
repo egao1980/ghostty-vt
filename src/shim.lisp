@@ -2,7 +2,7 @@
 
 ;;; native/ghostty-vt-cl.c: the struct-by-value calls, flattened.
 
-(defconstant +shim-abi+ 1)
+(defconstant +shim-abi+ 2)
 
 (cffi:defcfun ("ghostty_vt_cl_abi" %shim-abi) :int)
 
@@ -19,6 +19,15 @@
 (cffi:defcfun ("ghostty_vt_cl_terminal_scroll_viewport" %terminal-scroll-viewport)
     ffi:result
   (terminal :pointer) (tag :int) (value :intptr))
+
+(cffi:defcfun ("ghostty_vt_cl_terminal_grid_ref" %terminal-grid-ref) ffi:result
+  (terminal :pointer) (tag :int) (x :uint16) (y :uint32) (out :pointer))
+
+(defun terminal-grid-ref (terminal tag x y out)
+  "Fill the GhosttyGridRef at OUT for cell X, Y. TAG is a keyword of
+FFI:POINT-TAG (:ACTIVE :VIEWPORT :SCREEN :HISTORY). → the result keyword;
+the ref is only valid until the terminal next changes."
+  (%terminal-grid-ref terminal (cffi:foreign-enum-value 'ffi:point-tag tag) x y out))
 
 (defun key-event-set-utf8 (event pointer length)
   "Set EVENT's text to LENGTH UTF-8 bytes at POINTER. libghostty-vt keeps the

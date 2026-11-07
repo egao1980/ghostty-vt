@@ -85,3 +85,17 @@
              (gv:key-event-set-utf8 event s n)
              (ok (equal (gv:key-event-get-utf8 event) "é")))
         (ffi:key-event-free event)))))
+
+(deftest shim-grid-ref-hyperlink
+  (with-terminal (term 20 2)
+    (gv:with-octets-pointer (p n (octets (format nil "~C]8;;https://x.test/~C\\ab~C]8;;~C\\c"
+                                                 #\Esc #\Esc #\Esc #\Esc)))
+      (ffi:terminal-vt-write term p n))
+    (flet ((uri (x)
+             (cffi:with-foreign-object (ref '(:struct ffi:grid-ref))
+               (gv:check-result (gv:terminal-grid-ref term :active x 0 ref))
+               (gv:call-with-output-buffer
+                (lambda (buf len written) (ffi:grid-ref-hyperlink-uri ref buf len written))
+                'hyperlink-uri :initial-size 4))))
+      (ok (equalp (uri 0) (octets "https://x.test/")))
+      (ok (zerop (length (uri 2)))))))
