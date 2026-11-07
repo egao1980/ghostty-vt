@@ -1,15 +1,19 @@
 (defsystem "ghostty-vt"
-  :version "0.2.0"
+  :version "0.3.0"
   :description "CFFI bindings + native overlays for libghostty-vt 1.0 (Ghostty's terminal emulation library)"
   :author "egao1980"
   :license "MIT"
+  :defsystem-depends-on ("asdf-native")
   :depends-on ("cffi" "uiop")
   :serial t
   :pathname "src"
   :components ((:file "ffi-package")
                (:file "package")
                (:file "conditions")
-               (:file "loader")
+               ;; $GHOSTTY_VT_NATIVE, native/ (overlay), lib/<os>-<arch>/ (checkout).
+               ;; Core first: the shim's dependency then resolves to it.
+               (:native-library "ghostty-vt" :versions ("1"))
+               (:native-library "ghostty-vt-cl" :env "GHOSTTY_VT_NATIVE")
                (:file "ffi")
                (:file "api")
                (:file "shim")
