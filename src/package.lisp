@@ -3,7 +3,6 @@
   (:local-nicknames (#:ffi #:ghostty-vt.ffi))
   (:export
    ;; loading
-   #:load-ghostty-vt
    #:ghostty-vt-available-p
    #:ghostty-vt-version
    #:*supported-major-version*
